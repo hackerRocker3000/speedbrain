@@ -10,14 +10,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.util.Base64;
 
 public class HashService {
     private static final String HEXES = "0123456789ABCDEF";
     private static MessageDigest sha256;
     private static MessageDigest ripeMD160;
     private static ECNamedCurveParameterSpec spec;
-    private static byte[] P256_HEAD = Base64.getDecoder().decode("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE");
 
     public static void init() throws NoSuchAlgorithmException, NoSuchProviderException {
         Security.addProvider(new BouncyCastleProvider());
