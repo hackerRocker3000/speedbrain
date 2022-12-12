@@ -1,10 +1,8 @@
 package com.dimdof.math;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FileService {
@@ -29,4 +27,21 @@ public class FileService {
         }
         return listOfStrings.toArray(new String[0]);
     }
+
+    public static void writeBase(String filename, String[] data) {
+        try {
+            Arrays.sort(data);
+            BufferedWriter outputWriter = null;
+            outputWriter = new BufferedWriter(new FileWriter(filename));
+            for (int i = 0; i < data.length; i++) {
+                outputWriter.write(data[i]);
+                outputWriter.newLine();
+            }
+            outputWriter.flush();
+            outputWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

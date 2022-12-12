@@ -1,76 +1,42 @@
 package com.dimdof;
 
 import com.dimdof.math.FileService;
+import com.dimdof.math.GeneratorStr;
+import com.dimdof.math.HashService;
 
-import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        String[] base = FileService.readBase("H:\\vsakie_raschety\\BrainWords-main\\Windows\\Bitcoin_addresses_November_20_2022.txt");
+        try {
+            HashService.init();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchProviderException e) {
+            throw new RuntimeException(e);
+        }
+        GeneratorStr genStr = new GeneratorStr("0123456789abcdefghijklmnopqrstuvwxyz".toCharArray());
+        String brainWord = "0";
+        byte[] brainBytes = brainWord.getBytes();
 
-        byte[] existValue = "1EWqhfPMtKUutHdjPrXQUnyYx1oe2SJCd".getBytes(StandardCharsets.UTF_8);
-        byte[] notExistValue = "3FrpMoH1WJCqDxS8RQ7Kn1j6LZtDh9cg00".getBytes(StandardCharsets.UTF_8);
+        String[] base = FileService.readBase("H:\\vsakie_raschety\\BrainWords-main\\Windows\\hashes160_sorted.txt");
 
         long time1 = System.nanoTime();
-        for (int i = 0; i < 100; i++) Arrays.binarySearch(base, new String(existValue));
+        while (true) {
+            try {
+                brainWord = genStr.next(brainWord);
+                String hash160 = HashService.getHex(HashService.calcRipeMD160(HashService.calcSHA256(HashService.getPublicKey(HashService.calcSHA256(brainWord.getBytes())))));
+                if (Arrays.binarySearch(base, hash160.toLowerCase()) >= 0) {
+                    break;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        }
         long time2 = System.nanoTime();
-        System.out.println(time1 - time2);
-        System.out.println(Arrays.binarySearch(base, new String(existValue)));
-
-
-        time1 = System.nanoTime();
-        for (int i = 0; i < 100; i++) Arrays.binarySearch(base,  new String(notExistValue));
-        time2 = System.nanoTime();
-        System.out.println(time1 - time2);
-
-//        time1 = System.nanoTime();
-//        for (int i = 0; i < 100; i++) SearchService.compare(str1, str2);
-//        time2 = System.nanoTime();
-//        System.out.println(time1 - time2);
-//
-//        time1 = System.nanoTime();
-//        for (int i = 0; i < 100; i++) args[1].compareTo(new String(str1));
-//        time2 = System.nanoTime();
-//        System.out.println(time1 - time2);
-
-
-//        try {
-//            HashService.init();
-//            byte[] inputData = args[0].getBytes(StandardCharsets.UTF_8);
-//            byte[] privateKey = HashService.calcSHA256(inputData);
-//            long time1 = System.nanoTime();
-//            for (int i = 0; i < 100; i++) HashService.calcSHA256(inputData);
-//            long time2 = System.nanoTime();
-//            System.out.println(time1 - time2);
-//
-//            byte[] publicKey = HashService.getPublicKey( privateKey);
-//            time1 = System.nanoTime();
-//            for (int i = 0; i < 100; i++) HashService.getPublicKey( privateKey);
-//            time2 = System.nanoTime();
-//            System.out.println(time1 - time2);
-//
-//            byte[]  publicSha256 = HashService.calcSHA256( publicKey);
-//            time1 = System.nanoTime();
-//            for (int i = 0; i < 100; i++) HashService.calcSHA256( publicKey);
-//            time2 = System.nanoTime();
-//            System.out.println(time1 - time2);
-//
-//            time1 = System.nanoTime();
-//            for (int i = 0; i < 100; i++) HashService.calcRipeMD160( publicSha256);
-//            time2 = System.nanoTime();
-//            System.out.println(time1 - time2);
-//
-//            time1 = System.nanoTime();
-//            for (int i = 0; i < 100; i++) {
-//                HashService.calcRipeMD160(HashService.calcSHA256(HashService.getPublicKey(HashService.calcSHA256(inputData))));
-//            }
-//            time2 = System.nanoTime();
-//            System.out.println(time1 - time2);
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new RuntimeException(e);
-//        } catch (NoSuchProviderException e) {
-//            throw new RuntimeException(e);
-//        }
+        System.out.println(time2 - time1);
+        System.out.println(brainWord);
     }
 }
